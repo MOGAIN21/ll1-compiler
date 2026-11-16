@@ -1,4 +1,4 @@
-# compiler-frontend
+# ll1-compiler
 
 The front end of a compiler, written in C, for a small statically typed teaching language.
 It has a hand-written lexer, an LL(1) predictive parser built from automatically computed
