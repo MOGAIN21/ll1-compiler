@@ -1,0 +1,76 @@
+1. High-Level Program Structure
+
+<program>          ::= <otherFunctions> <mainFunction> 
+<mainFunction>     ::= TK_MAIN <stmts> TK_END 
+<otherFunctions>   ::= <function> <otherFunctions> | ε
+<function>         ::= TK_FUNID <input_par> <output_par> TK_SEM <stmts> TK_END
+<input_par>        ::= TK_INPUT TK_PARAMETER TK_LIST TK_SQL <parameter_list> TK_SQR
+<output_par>       ::= TK_OUTPUT TK_PARAMETER TK_LIST TK_SQL <parameter_list> TK_SQR | ε
+<parameter_list>   ::= <dataType> TK_ID <remaining_list>
+<remaining_list>   ::= TK_COMMA <parameter_list> | ε
+
+2. Data Types and Definitions
+
+<dataType>            ::= <primitiveDatatype> | <constructedDatatype>
+<primitiveDatatype>   ::= TK_INT | TK_REAL
+<constructedDatatype> ::= TK_RECORD TK_RUID | TK_UNION TK_RUID
+
+<typeDefinitions>     ::= <typeDefinition> <typeDefinitions> | <definetypeStmt> <typeDefinitions> | ε
+<typeDefinition>      ::= TK_RECORD TK_RUID <fieldDefinitions> TK_ENDRECORD
+                        | TK_UNION TK_RUID <fieldDefinitions> TK_ENDUNION
+<fieldDefinitions>    ::= <fieldDefinition> <fieldDefinition> <moreFields>
+<fieldDefinition>     ::= TK_TYPE <primitiveDatatype> TK_COLON TK_FIELDID TK_SEM
+<moreFields>          ::= <fieldDefinition> <moreFields> | ε
+<definetypeStmt>      ::= TK_DEFINETYPE <A> TK_RUID TK_AS TK_RUID
+<A>                   ::= TK_RECORD | TK_UNION
+
+3. Declarations and Statements
+
+<stmts>            ::= <typeDefinitions> <declarations> <otherStmts> <returnStmt>
+<declarations>     ::= <declaration> <declarations> | ε
+<declaration>      ::= TK_TYPE <dataType> TK_COLON TK_ID <global_or_not> TK_SEM
+<global_or_not>    ::= TK_COLON TK_GLOBAL | ε
+
+<otherStmts>       ::= <stmt> <otherStmts> | ε
+<stmt>             ::= <assignmentStmt> | <iterativeStmt> | <conditionalStmt> | <ioStmt> | <funCallStmt>
+
+<assignmentStmt>   ::= <singleOrRecId> TK_ASSIGNOP <arithmeticExpression> TK_SEM
+<singleOrRecId>    ::= TK_ID <option_dot>
+<option_dot>       ::= TK_DOT TK_FIELDID | ε
+
+4. Refined Arithmetic Expressions (Left-Recursion Removed)
+
+<arithmeticExpression> ::= <term> <expPrime>
+<expPrime>             ::= <lowOp> <term> <expPrime> | ε
+<term>                 ::= <factor> <termPrime>
+<termPrime>            ::= <highOp> <factor> <termPrime> | ε
+<factor>               ::= TK_OP <arithmeticExpression> TK_CL | <var>
+<lowOp>                ::= TK_PLUS | TK_MINUS
+<highOp>               ::= TK_MUL | TK_DIV
+<var>                  ::= TK_ID | TK_NUM | TK_RNUM
+
+5. Boolean Expressions and Control Flow
+
+<booleanExpression>  ::= <boolTerm> <boolPrime>
+<boolPrime>          ::= <logicalOp> <boolTerm> <boolPrime> | ε
+<boolTerm>           ::= TK_OP <booleanExpression> TK_CL | <var> <relationalOp> <var> | TK_NOT <booleanExpression>
+<logicalOp>          ::= TK_AND | TK_OR
+<relationalOp>       ::= TK_LT | TK_LE | TK_EQ | TK_GT | TK_GE | TK_NE
+
+<iterativeStmt>      ::= TK_WHILE TK_OP <booleanExpression> TK_CL <otherStmts> TK_ENDWHILE
+<conditionalStmt>    ::= TK_IF TK_OP <booleanExpression> TK_CL TK_THEN <otherStmts> <elsePart> TK_ENDIF
+<elsePart>           ::= TK_ELSE <otherStmts> | ε
+
+6. Function Calls and IO
+
+<funCallStmt>      ::= <outputParameters> TK_CALL TK_FUNID TK_WITH TK_PARAMETERS <inputParameters> TK_SEM
+<outputParameters> ::= TK_SQL <idList> TK_SQR TK_ASSIGNOP | ε
+<inputParameters>  ::= TK_SQL <idList> TK_SQR
+<idList>           ::= TK_ID <more_ids>
+<more_ids>         ::= TK_COMMA <idList> | ε
+
+<ioStmt>           ::= TK_READ TK_OP <singleOrRecId> TK_CL TK_SEM
+                     | TK_WRITE TK_OP <singleOrRecId> TK_CL TK_SEM
+
+<returnStmt>       ::= TK_RETURN <optionalReturn> TK_SEM
+<optionalReturn>   ::= TK_SQL <idList> TK_SQR | ε
